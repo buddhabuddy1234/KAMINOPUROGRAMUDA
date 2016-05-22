@@ -68,7 +68,7 @@ class Block(object):
         
     def check_collide(self, y, score, Player):
         """Checks collision based on coords"""
-        if self.x > Player.x and not self.x > Player.x + 30:
+        if (self.x > Player.x + 10 and self.x < Player.x + 40) or (self.x + 50 > Player.x + 10 and self.x + 50 < Player.x + 40):
             if (self.y < Player.y + 54 and self.y > Player.y) or (self.y + 10 > Player.y and self.y + 10 < Player.y + 54):
                 self.damage(Player, score)
 
@@ -92,6 +92,7 @@ class Block(object):
                 Player.speed += 0.05
             if self.colour == gold:
                 Player.invincibility = True
+                Player.health += disp_height
             if self.colour == foolsgold:
                 Player.speed = -Player.speed
             if Player.health < 0:
@@ -117,6 +118,17 @@ class Person(object):
         self.invincibility = False
     def createPerson(self):
         gameDisplay.blit(personImg, (self.x,self.y))
+    def toggleInvincibility(self):
+        if self.invincibility == False:
+            self.invicibility = True
+        else:
+            self.invincibility = False
+    def check_invinc(self):
+        if self.invincibility == True:
+            return True
+        else:
+            return False
+            
     def move(self,score):
         gameDisplay.blit(personImg, (self.x,self.y))
         for event in pygame.event.get():
@@ -131,10 +143,10 @@ class Person(object):
                     self.y_change = -self.speed
                 if event.key == pygame.K_DOWN:
                     self.y_change = self.speed
-                if event.key == pygame.K_LEFT:
-                    self.x_change = -self.speed*0.75
-                if event.key == pygame.K_RIGHT:
-                    self.x_change = self.speed*0.75
+##                if event.key == pygame.K_LEFT:
+##                    self.x_change = -self.speed*0.75
+##                if event.key == pygame.K_RIGHT:
+##                    self.x_change = self.speed*0.75
 
             if event.type == pygame.KEYUP:
                 print "kup"
@@ -151,7 +163,7 @@ class Person(object):
 
         if self.y > disp_width or self.y < 0 or self.y > 550:
             self.y_change = 0
-    
+    #I think some of these I use interchangably...
     def return_y(self):
         return self.y
     def return_x(self):
@@ -163,7 +175,11 @@ class Person(object):
     def take_health(self):
         self.health += 5
     def health_bar(self):
-        pygame.draw.rect(gameDisplay, green, [disp_width-10,disp_height/2, 10, self.health])
+        if self.health > disp_height:
+            health_color = gold
+        else:
+            health_color = green
+        pygame.draw.rect(gameDisplay, health_color, [disp_width-10,0, 10, self.health])
 
 
 class Game(object):
@@ -198,6 +214,7 @@ class Game(object):
             if time.time() - orgTime >= 5:
                 Player.invincibility = False
                 orgTime == time.time()
+            invinc = Player.check_invinc()
             if Player.invincibility == True:
                 print "invincible"
             print health
@@ -211,14 +228,12 @@ class Game(object):
             for dango in kris_tup:
                 if dango.x < disp_width:
                     dango.move()
-                    dango.check_collide(y, score, Player)
+                    if invinc == False:
+                        dango.check_collide(y, score, Player)
+                    else:
+                        pass
             pygame.display.update() #Flip
             clocl.tick(60)
             score += 1
-            
-
-
-    
-
 
 Game = Game(disp_width, disp_height)
