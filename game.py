@@ -69,7 +69,7 @@ class Block(object):
     def check_collide(self, y, score, Player):
         """Checks collision based on coords"""
         if self.x > Player.x and not self.x > Player.x + 30:
-            if (self.y < y and self.y > y + 54) or (self.y + 10 > y and self.y + 10 < y + 54):
+            if (self.y < Player.y + 54 and self.y > Player.y) or (self.y + 10 > Player.y and self.y + 10 < Player.y + 54):
                 self.damage(Player, score)
 
     def move(self):
@@ -162,6 +162,9 @@ class Person(object):
         self.health -= 30
     def take_health(self):
         self.health += 5
+    def health_bar(self):
+        pygame.draw.rect(gameDisplay, green, [disp_width-10,disp_height/2, 10, self.health])
+
 
 class Game(object):
     def __init__(self, disp_width, disp_height):
@@ -190,6 +193,7 @@ class Game(object):
             if score < 60:
                 Player = Person()
             y = Player.return_y()
+            Player.health_bar()
             health = Player.return_health()
             if time.time() - orgTime >= 5:
                 Player.invincibility = False
