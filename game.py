@@ -21,7 +21,7 @@ foolsgold = (197, 179, 88)
 colours = (black, red, green, blue)
 spec_colours = (foolsgold, gold)
 personImg = pygame.image.load("woman.bmp")
-heartImg = pygame.image.load("heart.jpg")
+##heartImg = pygame.image.load("heart.jpg")
 gameDisplay = pygame.display.set_mode((disp_width,disp_height))
 
 
@@ -69,8 +69,8 @@ class Block(object):
         if self.hard == False:
             self.colour = colour
             self.speed = speed
-            block_magic = random.randrange(0,1000)
-            if block_magic == 50:
+            block_magic = random.randrange(0,125)
+            if block_magic == random.randrange(0,125):
                 self.colour = random.choice(spec_colours)
                 if self.colour == gold:
                     self.speed = 9
@@ -269,7 +269,7 @@ class Game(object):
                 print "invincible"
             print health
             Player.move(score)
-            if score/60 == len(level):
+            if score/120 == len(level):
                 level += "dango",
                 for i in range(len(level)):
                     kris_tup.append(Block(random.randrange(-1000, 0),random.randrange(0, disp_height), random.choice(colours), 5,hard))
