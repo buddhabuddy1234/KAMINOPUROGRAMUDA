@@ -84,7 +84,7 @@ class Block(object):
                 if self.colour == foolsgold:
                     self.speed = 8 + (score*0.0005)
             if self.colour == red:
-                self.speed = 10 + (score*0.0005)
+                self.speed = random.randrange(10, 15) + (score*0.0005)
             if self.colour == blue:
                 self.speed = 8 + (score*0.0005)
             if self.colour == green:
@@ -119,7 +119,10 @@ class Block(object):
     def damage(self, Player, score):
         if self.colour == green:
             Player.health += 10
-            Player.speed = 5
+            if Player.speed > 5:
+                Player.speed -= 0.5
+            if Player.speed < 5:
+                Player.speed += 0.5
         if Player.invincibility == False:
             if self.colour == red:
                 Player.health -= 30
@@ -224,7 +227,7 @@ class Person(object):
             health_color = gold
         else:
             health_color = green
-        pygame.draw.rect(gameDisplay, health_color, [disp_width-10,0, 10, self.health/10])
+        pygame.draw.rect(gameDisplay, health_color, [disp_width-10,0, 10, self.health/2])
 
 
 class Game(object):
@@ -270,11 +273,11 @@ class Game(object):
 ##            if score > 3000 and score < 4000:
 ##                message_display("LOL, jk. die. :3")
 ##                hard = True
-            if score > 4000 and score < 4200:
-                message_display("Cheater")
-            if score > 4200:
-                Player.x = disp_height/2
-                Player.y = disp_width/2
+##            if score > 4000 and score < 4200:
+##                message_display("Cheater")
+##            if score > 4200:
+##                Player.x = disp_height/2
+##                Player.y = disp_width/2
 
             y = Player.return_y()
             Player.health_bar()
