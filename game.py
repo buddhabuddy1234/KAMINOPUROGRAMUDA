@@ -20,7 +20,8 @@ gold = (250, 215, 0)
 foolsgold = (197, 179, 88)
 colours = (black, red, green, blue, red, red, red, red)
 spec_colours = (foolsgold, gold)
-personImg = pygame.image.load("woman.bmp").convert_alpha()
+personImg = pygame.image.load("woman.bmp")
+personImg = personImg.convert_alpha()
 heartImg = pygame.image.load("heart.jpg")
 kittenImg = pygame.image.load("kitten.jpg").convert_alpha()
 
@@ -78,21 +79,21 @@ class Block(object):
         if self.hard == False:
             self.colour = colour
             self.speed = (speed + (score*0.0001))
-            block_magic = random.randrange(0,1000)
-            if block_magic == random.randrange(0,1000):
+            block_magic = random.randrange(0,100)
+            if block_magic == random.randrange(0,100):
                 self.colour = random.choice(spec_colours)
                 if self.colour == gold:
-                    self.speed = 9 + (score*0.001)
+                    self.speed = 9 + (score*0.0005)
                 if self.colour == foolsgold:
-                    self.speed = 8 + (score*0.001)
+                    self.speed = 8 + (score*0.0005)
             if self.colour == red:
-                self.speed = 10 + (score*0.001)
+                self.speed = 10 + (score*0.0005)
             if self.colour == blue:
-                self.speed = 8 + (score*0.001)
+                self.speed = 8 + (score*0.0005)
             if self.colour == green:
-                self.speed = 3 + (score*0.001)
+                self.speed = 3 + (score*0.0005)
             if self.colour == black:
-                self.speed = 7 + (score*0.001)
+                self.speed = 7 + (score*0.0005)
         else:
             self.colour = red
             self.speed = 9
@@ -207,7 +208,7 @@ class Person(object):
         self.y += self.y_change
 
 
-        if self.y > disp_width or self.y < 0 or self.y > 550:
+        if self.y > disp_width or self.y < 0 or self.y > 540:
             self.y_change = 0
     #I think some of these I use interchangably...
     def return_y(self):
@@ -229,7 +230,7 @@ class Person(object):
 
 
 class Game(object):
-    def __init__(self, disp_width, disp_height, kittenImg):
+    def __init__(self, disp_width, disp_height, kittenImg,score = 0):
         #Initialize Window
         hard = False
         pygame.init()
@@ -243,7 +244,7 @@ class Game(object):
         clock2 = pygame.time.Clock()
         #etc
 
-        score = 0
+        score = score
         #wom 30, 54
         #rekt 50, 10
         level = ()
@@ -286,7 +287,7 @@ class Game(object):
             if Player.invincibility == True:
                 print "invincible"
             Player.move(score)
-            if score/60 == len(level):
+            if score/120 == len(level):
                 level += "dango",
                 for i in range(len(level)):
                     kris_tup.append(Block(score, random.randrange(-1000, 0),random.randrange(0, disp_height), random.choice(colours), 5,hard))
