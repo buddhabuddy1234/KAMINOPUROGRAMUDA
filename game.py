@@ -1,4 +1,4 @@
-import pygame,time,random
+import pygame,time,random,cPickle
 from Tkinter import *
 #Kenneth Koepcke, Parth Triviality
 #Final Project
@@ -8,9 +8,9 @@ from Tkinter import *
 ##CPickle scores
 ##idk
 #ANYTHING WITH INVINCIBILITY DOES NOT WORK AT ALL
-
 disp_width = 800
 disp_height = 600
+gameDisplay = pygame.display.set_mode((disp_width,disp_height))
 black = (0, 0, 0)
 white = (255, 255, 255)
 red = (255, 0, 0)
@@ -18,11 +18,11 @@ green = (0, 255, 0)
 blue = (0, 0, 255)
 gold = (250, 215, 0)
 foolsgold = (197, 179, 88)
-colours = (black, red, green, blue)
+colours = (black, red, green, blue, red, red, red, red)
 spec_colours = (foolsgold, gold)
-personImg = pygame.image.load("woman.bmp")
-##heartImg = pygame.image.load("heart.jpg")
-gameDisplay = pygame.display.set_mode((disp_width,disp_height))
+personImg = pygame.image.load("woman.bmp").convert_alpha()
+heartImg = pygame.image.load("heart.jpg")
+kittenImg = pygame.image.load("kitten.jpg").convert_alpha()
 
 
 #rogue functions I don't want to change
@@ -52,38 +52,47 @@ def text_object(text, font):
     textSurface = font.render(text, True, blue)
     return textSurface, textSurface.get_rect()
 #Something I might end up finishing
-class Application(Frame):
-    def __init__(self, master):
-        self.grid()
-        self.create_widgets()
 
-    def create_widgets(self):
-        self.f_label = Label(self, text = "Super Slime Soccer Settings").grid(row = 0, column = 1, sticky = W)
+##class Application(Frame):
+##    def __init__(self, master):
+##        self.grid()
+##        self.create_widgets()
+##
+##    def create_widgets(self):
+##        self.f_label = Label(self, text = "Super Slime Soccer Settings").grid(row = 0, column = 1, sticky = W)
+##        self.r_easy_var = StringVar()
+##        self.r_ease_var.set("small ")
+##        self.r_tshirt_small = Radiobutton(self, text = "Small", variable = self.r_tshirt_var, value = "small ")
+##        self.r_tshirt_small.grid(row = 3, column = 1, sticky = W)
+##
+##        self.r_tshirt_med = Radiobutton(self, text = "Medium", variable = self.r_tshirt_var, value = "medium ")
+##        self.r_tshirt_med.grid(row = 3, column = 2, sticky = W)
 
 class Block(object):
     """Block class, creates bullets. Has defaulted aspects"""
-    def __init__(self, object_startx = -500, object_starty = random.randrange(0, disp_height),colour = red, speed = 5, hard = False):
+    def __init__(self, score, object_startx = -500, object_starty = random.randrange(0, disp_height),colour = red, speed = 5, hard = False):
         """Takes in Object start x, object star y, object speed"""
         #Could use indexing; could be less lazy
-        self.hard = hard
+        self.collide = False
+        self.hard = False
         if self.hard == False:
             self.colour = colour
-            self.speed = speed
-            block_magic = random.randrange(0,125)
-            if block_magic == random.randrange(0,125):
+            self.speed = (speed + (score*0.0001))
+            block_magic = random.randrange(0,1000)
+            if block_magic == random.randrange(0,1000):
                 self.colour = random.choice(spec_colours)
                 if self.colour == gold:
-                    self.speed = 9
+                    self.speed = 9 + (score*0.001)
                 if self.colour == foolsgold:
-                    self.speed = 8
+                    self.speed = 8 + (score*0.001)
             if self.colour == red:
-                self.speed = 10
+                self.speed = 10 + (score*0.001)
             if self.colour == blue:
-                self.speed = 8
+                self.speed = 8 + (score*0.001)
             if self.colour == green:
-                self.speed = 3
+                self.speed = 3 + (score*0.001)
             if self.colour == black:
-                self.speed = 7
+                self.speed = 7 + (score*0.001)
         else:
             self.colour = red
             self.speed = 9
@@ -97,15 +106,19 @@ class Block(object):
         if (self.x > Player.x + 10 and self.x < Player.x + 40) or (self.x + 50 > Player.x + 10 and self.x + 50 < Player.x + 40):
             if (self.y < Player.y + 54 and self.y > Player.y) or (self.y + 10 > Player.y and self.y + 10 < Player.y + 54):
                 self.damage(Player, score)
+                self.collide = True
 
     def move(self):
         """Draws every tic, assumes that bullet will always move"""
-        pygame.draw.rect(gameDisplay, self.colour, [self.x, self.y, self.width, self.height])
-        self.x += self.speed
+        if self.collide == False:
+            pygame.draw.rect(gameDisplay, self.colour, [self.x, self.y, self.width, self.height])
+            self.x += self.speed
+        if self.collide == True:
+            self.x = 0
 
     def damage(self, Player, score):
         if self.colour == green:
-            Player.health += 1
+            Player.health += 10
             Player.speed = 5
         if Player.invincibility == False:
             if self.colour == red:
@@ -167,7 +180,6 @@ class Person(object):
                 quit()
 
             if event.type == pygame.KEYDOWN:
-                print "kdown"
                 if event.key == pygame.K_UP:
                     self.y_change = -self.speed
                 if event.key == pygame.K_DOWN:
@@ -176,9 +188,13 @@ class Person(object):
                     self.x_change = -self.speed*0.75
                 if event.key == pygame.K_RIGHT:
                     self.x_change = self.speed*0.75
+                if event.key == pygame.K_z and not event.key == pygame.K_RSHIFT:
+                    self.health = 9999
+                if event.key == pygame.K_x:
+                    self.speed = 20
+                    
 
             if event.type == pygame.KEYUP:
-                print "kup"
                 if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                     self.x_change = 0
                 if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
@@ -213,7 +229,7 @@ class Person(object):
 
 
 class Game(object):
-    def __init__(self, disp_width, disp_height):
+    def __init__(self, disp_width, disp_height, kittenImg):
         #Initialize Window
         hard = False
         pygame.init()
@@ -237,11 +253,13 @@ class Game(object):
         while not gameExit:
 
             gameDisplay.fill(white)
+            gameDisplay.blit(kittenImg, (0,0))
+
             if score < 60:
                 Player = Person()
                 message_display("Welcome to the program!")
-            if score > 60 and score < 200:
-                message_display("Now die!")
+##            if score > 60 and score < 200:
+##                message_display("Now die!")
 ##            if score > 1200 and score < 1400:
 ##                message_display("You're not dead yet..?")
 ##            if score > 1400 and score < 1800:
@@ -252,11 +270,11 @@ class Game(object):
 ##            if score > 3000 and score < 4000:
 ##                message_display("LOL, jk. die. :3")
 ##                hard = True
-##            if score > 4000 and score < 4200:
-##                message_display("Cheater")
-##            if score > 4200:
-##                Player.x = disp_height/2
-##                Player.y = disp_width/2
+            if score > 4000 and score < 4200:
+                message_display("Cheater")
+            if score > 4200:
+                Player.x = disp_height/2
+                Player.y = disp_width/2
 
             y = Player.return_y()
             Player.health_bar()
@@ -267,17 +285,18 @@ class Game(object):
             invinc = Player.check_invinc()
             if Player.invincibility == True:
                 print "invincible"
-            print health
             Player.move(score)
-            if score/120 == len(level):
+            if score/60 == len(level):
                 level += "dango",
                 for i in range(len(level)):
-                    kris_tup.append(Block(random.randrange(-1000, 0),random.randrange(0, disp_height), random.choice(colours), 5,hard))
+                    kris_tup.append(Block(score, random.randrange(-1000, 0),random.randrange(0, disp_height), random.choice(colours), 5,hard))
                     
                     
             for dango in kris_tup:
                 if dango.x < disp_width:
                     dango.move()
+##                    if str(score/60)[-1] in ("1", "2", "3", "4", "5", "6", "7", "8", "9", "0"):
+##                        print dango.speed
                     if invinc == False:
                         dango.check_collide(y, score, Player)
                     else:
@@ -286,4 +305,4 @@ class Game(object):
             clocl.tick(60)
             score += 1
 
-Game = Game(disp_width, disp_height)
+Game = Game(disp_width, disp_height, kittenImg)
