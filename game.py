@@ -18,14 +18,11 @@ green = (0, 255, 0)
 blue = (0, 0, 255)
 gold = (250, 215, 0)
 foolsgold = (197, 179, 88)
-colours = (black, red, green, blue, red, red, red, red)
+colours = (black, red, green, blue, red, red, red, red, red, red, red)
 spec_colours = (foolsgold, gold)
-personImg = pygame.image.load("woman.bmp")
-personImg = personImg.convert_alpha()
+personImg = pygame.image.load("woman.bmp") #woman.jpg for millenium falcon
 heartImg = pygame.image.load("heart.jpg")
-kittenImg = pygame.image.load("kitten.jpg").convert_alpha()
-
-
+kittenImg = pygame.image.load("kitten.jpg")
 #rogue functions I don't want to change
 def crash(score):
     text = "Time: "
@@ -108,6 +105,8 @@ class Block(object):
             if (self.y < Player.y + 54 and self.y > Player.y) or (self.y + 10 > Player.y and self.y + 10 < Player.y + 54):
                 self.damage(Player, score)
                 self.collide = True
+        if self.x > disp_width:
+            self.collide = True
 
     def move(self):
         """Draws every tic, assumes that bullet will always move"""
@@ -133,7 +132,7 @@ class Block(object):
                 Player.speed += 1
             if self.colour == gold:
                 #Doesn't work lol
-                Player.invincibility = True
+##                Player.invincibility = True
                 Player.health += disp_height
             if self.colour == foolsgold:
                 Player.speed = -Player.speed
@@ -149,7 +148,6 @@ class Person(object):
     """Player object"""
     def __init__(self,x = disp_width-40,y=0):
         """creates player"""
-        print "init"
         self.x = x
         self.y = y
         self.x_change = 0
@@ -160,17 +158,17 @@ class Person(object):
         self.invincibility = False
     def createPerson(self):
         gameDisplay.blit(personImg, (self.x,self.y))
-    def toggleInvincibility(self):
-        #LOTTA LOGIC, NOT MANY RESULTS
-        if self.invincibility == False:
-            self.invicibility = True
-        else:
-            self.invincibility = False
-    def check_invinc(self):
-        if self.invincibility == True:
-            return True
-        else:
-            return False
+##    def toggleInvincibility(self):
+##        #LOTTA LOGIC, NOT MANY RESULTS
+##        if self.invincibility == False:
+##            self.invicibility = True
+##        else:
+##            self.invincibility = False
+##    def check_invinc(self):
+##        if self.invincibility == True:
+##            return True
+##        else:
+##            return False
             
     def move(self,score):
         gameDisplay.blit(personImg, (self.x,self.y))
@@ -182,11 +180,11 @@ class Person(object):
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
-                    self.y_change = -self.speed
+                    self.y_change = -self.speed + 0.1
                 if event.key == pygame.K_DOWN:
                     self.y_change = self.speed
                 if event.key == pygame.K_LEFT:
-                    self.x_change = -self.speed*0.75
+                    self.x_change = -self.speed*0.75 + 0.1
                 if event.key == pygame.K_RIGHT:
                     self.x_change = self.speed*0.75
                 if event.key == pygame.K_z and not event.key == pygame.K_RSHIFT:
@@ -232,6 +230,7 @@ class Person(object):
 class Game(object):
     def __init__(self, disp_width, disp_height, kittenImg,score = 0):
         #Initialize Window
+        difficulty = 2
         hard = False
         pygame.init()
         self.disp_width = disp_width
@@ -259,8 +258,8 @@ class Game(object):
             if score < 60:
                 Player = Person()
                 message_display("Welcome to the program!")
-##            if score > 60 and score < 200:
-##                message_display("Now die!")
+            if score > 60 and score < 200:
+                message_display("Now die!")
 ##            if score > 1200 and score < 1400:
 ##                message_display("You're not dead yet..?")
 ##            if score > 1400 and score < 1800:
@@ -283,13 +282,13 @@ class Game(object):
             if time.time() - orgTime >= 5:
                 Player.invincibility = False
                 orgTime == time.time()
-            invinc = Player.check_invinc()
+##            invinc = Player.check_invinc()
             if Player.invincibility == True:
                 print "invincible"
             Player.move(score)
             if score/120 == len(level):
                 level += "dango",
-                for i in range(len(level)):
+                for i in range(len(level)^2):
                     kris_tup.append(Block(score, random.randrange(-1000, 0),random.randrange(0, disp_height), random.choice(colours), 5,hard))
                     
                     
@@ -298,7 +297,7 @@ class Game(object):
                     dango.move()
 ##                    if str(score/60)[-1] in ("1", "2", "3", "4", "5", "6", "7", "8", "9", "0"):
 ##                        print dango.speed
-                    if invinc == False:
+                    if False == False:
                         dango.check_collide(y, score, Player)
                     else:
                         pass
@@ -307,3 +306,4 @@ class Game(object):
             score += 1
 
 Game = Game(disp_width, disp_height, kittenImg)
+Game2 = Game(disp_width, disp_height, kittenImg)
