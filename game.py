@@ -39,10 +39,10 @@ def crash_message_display(text):
     pygame.display.update()
     time.sleep(3)
 
-def message_display(text):
+def message_display(text, x = disp_width/2, y = disp_height/2):
     display_text = pygame.font.Font("freesansbold.ttf", 50)
     textSurf, textRect = text_object(text, display_text)
-    textRect.center = ((disp_width/2),(disp_height/2))
+    textRect.center = ((x),(y))
     gameDisplay.blit(textSurf, textRect)
 
         
@@ -68,16 +68,18 @@ def text_object(text, font):
 
 class Block(object):
     """Block class, creates bullets. Has defaulted aspects"""
-    def __init__(self, score, object_startx = -500, object_starty = random.randrange(0, disp_height),colour = red, speed = 5, hard = False):
+    def __init__(self, score, object_startx = -500, object_starty = random.randrange(0, disp_height),colour = red, speed = 5, hard = False, width = 50, height = 10):
         """Takes in Object start x, object star y, object speed"""
         #Could use indexing; could be less lazy
         self.collide = False
         self.hard = False
+        self.width = width
+        self.height = height
         if self.hard == False:
             self.colour = colour
             self.speed = (speed + (score*0.0001))
-            block_magic = random.randrange(0,100)
-            if block_magic == random.randrange(0,100):
+            block_magic = random.randrange(0,1000)
+            if block_magic == random.randrange(0,1000):
                 self.colour = random.choice(spec_colours)
                 if self.colour == gold:
                     self.speed = 9 + (score*0.0005)
@@ -96,13 +98,11 @@ class Block(object):
             self.speed = 9
         self.x = object_startx
         self.y = object_starty
-        self.width = 50
-        self.height = 10
         
     def check_collide(self, y, score, Player):
         """Checks collision based on coords"""
-        if (self.x > Player.x + 10 and self.x < Player.x + 40) or (self.x + 50 > Player.x + 10 and self.x + 50 < Player.x + 40):
-            if (self.y < Player.y + 54 and self.y > Player.y) or (self.y + 10 > Player.y and self.y + 10 < Player.y + 54):
+        if (self.x > Player.x + 8 and self.x < Player.x + Player.width) or (self.x + self.width > Player.x + 8 and self.x + self.width < Player.x + Player.width):
+            if (self.y > Player.y and self.y < Player.y + Player.height - 10) or (self.y + self.height < Player.y and self.y + self.height > Player.y + Player.height - 10):
                 self.damage(Player, score)
                 self.collide = True
         if self.x > disp_width:
@@ -153,6 +153,8 @@ class Person(object):
         """creates player"""
         self.x = x
         self.y = y
+        self.width = 30
+        self.height = 54
         self.x_change = 0
         self.y_change = 0
         self.speed = 5
@@ -194,6 +196,8 @@ class Person(object):
                     self.health = 9999
                 if event.key == pygame.K_x:
                     self.speed = 20
+                if event.key == pygame.K_p:
+                    score += 1000
                     
 
             if event.type == pygame.KEYUP:
@@ -202,15 +206,27 @@ class Person(object):
                 if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
                     self.y_change = 0
 
+
+        if self.x + self.width > disp_width:
+            if self.x_change > 0:
+                self.x_change = 0
+        if self.x < 0:
+            if self.x_change < 0:
+                self.x_change = 0
+
         self.x += self.x_change
 
-        if self.x > disp_width or self.x < 15 or self.x > 765:
-            self.x_change = 0
+
+
+
+        if self.y + self.height > disp_height:
+            if self.y_change > 0:
+                self.y_change = 0
+        if self.y < 0:
+            if self.y_change < 0:
+                self.y_change = 0
+                
         self.y += self.y_change
-
-
-        if self.y > disp_width or self.y < 0 or self.y > 540:
-            self.y_change = 0
     #I think some of these I use interchangably...
     def return_y(self):
         return self.y
@@ -292,7 +308,7 @@ class Game(object):
             if score/120 == len(level):
                 level += "dango",
                 for i in range(len(level)^2):
-                    kris_tup.append(Block(score, random.randrange(-1000, 0),random.randrange(0, disp_height), random.choice(colours), 5,hard))
+                    kris_tup.append(Block(score, random.randrange(-1000, 0),random.randrange(0, disp_height), random.choice(colours), 5,hard, random.randrange(50,100), random.randrange(5,20)))
                     
                     
             for dango in kris_tup:
@@ -304,6 +320,7 @@ class Game(object):
                         dango.check_collide(y, score, Player)
                     else:
                         pass
+            message_display(str(score/60) + "s", 80, 30)
             pygame.display.update() #Flip
             clocl.tick(60)
             score += 1
